@@ -9,6 +9,10 @@ import yaml
 import glob
 import os
 
+"""Global Variables"""
+SUCCESSFUL_STATUS_CODES = [200, 403]
+MAX_BACKUPS = 20
+
 def get_logger():
     """setup logging"""
     logging.basicConfig(stream = sys.stdout, level=logging.INFO)
@@ -83,7 +87,7 @@ def backup_config(config_file):
 
     """If more than 20 backups, delete oldest"""
     backups = sorted(glob.glob(f"{backups_dir}/{file_name}.backup_*"), key=os.path.getctime)
-    if len(backups) > 20:
+    if len(backups) >= MAX_BACKUPS:
         logger.info("More than 20 backups. Deleting oldest")
         os.remove(backups[0])
 
@@ -108,7 +112,6 @@ def main():
     """Get parameters"""
     args = get_parameters()
 
-    """Set variables"""
     config_file = args.config
 
     """Backup config file"""
@@ -121,10 +124,14 @@ def main():
     """Check status for each service"""
     for service in services:
         logger.info(f"Checking status for {service['Application']}")
-        status = get_status_code(service['url'])
-        
+        try:
+            status = get_status_code(service['url'])
+        except Exception as e:
+            logger.error(f"Error getting status for {service['Application']}. Error: {e}")
+            continue
+
         """Check status and update tagstyle"""
-        if status == 200 or status == 403:
+        if status in SUCCESSFUL_STATUS_CODES:
             logger.info(f"{service['Application']} is up")
             update_tagstyle(config_file, service['Application'], "is-success")
         else:
