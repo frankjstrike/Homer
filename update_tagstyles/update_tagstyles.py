@@ -82,7 +82,7 @@ def backup_config(config_file):
         yaml.safe_dump(data, file)
 
     """If more than 20 backups, delete oldest"""
-    backups = sorted(glob.glob(f"{config_file}.backup_*"), key=os.path.getctime)
+    backups = sorted(glob.glob(f"{backups_dir}/{file_name}.backup_*"), key=os.path.getctime)
     if len(backups) > 20:
         logger.info("More than 20 backups. Deleting oldest")
         os.remove(backups[0])
