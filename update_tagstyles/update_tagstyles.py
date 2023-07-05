@@ -127,7 +127,8 @@ def main():
         try:
             status = get_status_code(service['url'])
         except Exception as e:
-            logger.error(f"Error getting status for {service['Application']}. Error: {e}")
+            logger.error(f"Error getting status for {service['Application']}. Changing tagstyle to is-danger\nError: {e}")
+            update_tagstyle(config_file, service['Application'], "is-danger")
             continue
 
         """Check status and update tagstyle"""
