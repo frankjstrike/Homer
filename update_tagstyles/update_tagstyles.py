@@ -87,7 +87,7 @@ def backup_config(config_file):
 
     """If more than max backups, delete oldest"""
     backups = sorted(glob.glob(f"{backups_dir}/{file_name}.backup_*"), key=os.path.getctime)
-    if len(backups) >= MAX_BACKUPS:
+    if len(backups) > MAX_BACKUPS:
         logger.info("Max backups reached. Deleting oldest")
         os.remove(backups[0])
 
